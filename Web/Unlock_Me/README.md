@@ -143,6 +143,8 @@ Use an online Base64Url encoder to encode the modified JWT payload to get ```eyJ
 
 ![Payload B64Url encode](pics/b64url_encode2.jpg)
 
+> Note: The "iat" parameter specified in the JWT Payload is an ["Issued at" Claim](https://tools.ietf.org/html/rfc7519#page-10). This means that there is a possibility that JWT tokens are also verified based on their age, and can expire, thereby invalidating the token. This also means that, as the "iat" time changes, so will the JWT signature, because of the SHA256 hashing algorithm used in HS256 (and RS256).
+
 #### Step 4 
 Piece together the Base64Url encoded JWT Header and Payload, separating the header and payload with a dot (.), and we're now ready to sign this token with the target's public key
 - ```eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1pbmlvbiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTYwNzQyNDIwMX0```
@@ -189,7 +191,7 @@ redfl4g@kali$ curl -X GET -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6
 
 {"flag":"govtech-csg{5!gN_0F_+h3_T!m3S}"}
 ```
-> Note: The "iat" parameter specified in the JWT Payload is an ["Issued at" Claim](https://tools.ietf.org/html/rfc7519#page-10). This means that there is a possibility that JWT tokens are also verified based on their age, and can expire, thereby invalidating the token. This also means that, as the "iat" time changes, so will the JWT signature, because of the SHA256 hashing algorithm used in HS256 (and RS256).
+
 
 <br>
 
