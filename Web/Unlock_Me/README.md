@@ -33,7 +33,7 @@ Our client then recieves a JSON response containing an access token
 
 ![Access Token](pics/access_token.jpg)
 
-The request to ```unlock``` utilizes the access token received, as an Authorization [Bearer token](https://oauth.net/2/bearer-tokens/) in its request
+The request to ```unlock``` utilizes the access token received, as an Authorization [Bearer token](https://oauth.net/2/bearer-tokens/) in its GET request
 
 ![pics](pics/bearer_token.jpg)
 
