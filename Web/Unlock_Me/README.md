@@ -69,7 +69,7 @@ There are a number of different types of [JWT attacks](https://apisecurity.io/is
 
 Things to note before conducting a JWT Downgrade Attack
 - The **JWT Header**, the first section of the JWT token, specifies the Signing Algorithm used (e.g. HS256/RS256)
-- The **JWT Paylod**, the second section of the JWT token, contains specific information depending on the design of how the web application
+- The **JWT Paylod**, the second section of the JWT token, contains specific information depending on the design of how the web application processes the information
 - The **JWT Signature**, the third and final section
 	- if the HS256 signing algorithm is used, the signature is generated from a **shared secret key** (HMAC with SHA256)
 	- if the RS256 signing algorithm is used, the signature is generated from a **private key** (RSA with SHA256)
@@ -98,11 +98,11 @@ The [JWT Downgrade Attack](https://www.nccgroup.com/uk/about-us/newsroom-and-eve
 | 3        | Base64Url decode and modify the "role" specified in the JWT Payload to ```admin```, then Base64Url encode the result| 
 | 4        | Piece together the Base64Url encoded JWT Header and Payload, separating the header and payload with a dot (.), and we're now ready to sign this token with the target's public key|
 | 5        | Retrieve and save the public key from ```http://yhi8bpzolrog3yw17fe0wlwrnwllnhic.alttablabs.sg:41031/public.pem```                                                                                                                                                                                        |
-| 6        | Convert the public key into ASCII hex using <br><br>```cat public.pem | xxd -p | tr -d "\\n"``` |
+| 6        | Convert the public key into an ASCII hex HMAC |
 | 7        | Sign the token from **Step 4** using the result from **Step 6**. This will result in an ASCII hex HMAC Signature|
 | 8| Encode the ASCII hex HMAC Signature from **Step 7**. The result will be the JWT Signature (third section) of your new JWT|
 | 9 | Piece together your JWT, appending the JWT Signature from **Step 8** to your JWT Header and JWT Payload|
-| 10 | Submit the token to the endpoint ```http://yhi8bpzolrog3yw17fe0wlwrnwllnhic.alttablabs.sg:41031/unlock``` and retrieve your flag!|
+| 10 | Submit the token as a Bearer token to the endpoint ```http://yhi8bpzolrog3yw17fe0wlwrnwllnhic.alttablabs.sg:41031/unlock``` and retrieve the flag!|
 
 #### Step 1
 ```bash
@@ -123,7 +123,6 @@ Use an online Base64Url encoder to encode the modified JWT header to get ```eyJh
 
 #### Step 3
 ```bash
-# Step 3
 redfl4g@kali$  echo "eyJ1c2VybmFtZSI6Im1pbmlvbiIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNjA3NDI0MjAxfQ" |  base64 -d | sed 's/+/-/g; s/\//_/g; s/:"user/:"admin/g';
 
 {"username":"minion","role":"admin","iat":1607424201}
