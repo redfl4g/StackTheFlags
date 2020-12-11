@@ -1,5 +1,7 @@
 # Web Challenge 2: Logged In
 
+Writeup by [@redfl4g](https://github.com/redfl4g)
+
 ## Overview/TLDR
 This was a frustrating yet interesting challenge to solve, as it involved learning the basics about ExpressJS Middleware as well as dissecting the code to understand it's processing functions from external libraries.
 
