@@ -1,5 +1,7 @@
 # Web Challenge 3: Unlock Me
 
+Writeup by [@redfl4g](https://github.com/redfl4g)
+
 ## Overview/TLDR
 1. Modify the JWT Header and Payload (received when logging in from the endpoint ```/login```)
 2. Conduct a [JWT Downgrade attack](https://www.nccgroup.com/uk/about-us/newsroom-and-events/blogs/2019/january/jwt-attack-walk-through/)
