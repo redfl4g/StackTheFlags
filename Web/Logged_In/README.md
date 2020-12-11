@@ -53,7 +53,7 @@ If a user is successfully authenticated, it will return to the ```router.post```
 ### Head Scratching Intensifies
 After a few hours of researching, searching for known vulnerabilities and for any improper/insecure codes, it yielded no results..
 
-In a desperate attempt, we started to fuzz the API with different credentials to observe any unexpected behaviour returned..when suddenly, we get the flag when we sent a POST request with both empty ```username``` and ```password``` parameters!!
+In a desperate attempt, we started to fuzz the API with different credentials to observe any unexpected behaviour returned..when suddenly, we get the flag ```govtech-csg{m!sS1nG_cR3DeN+!@1s}``` when we sent a POST request with both empty ```username``` and ```password``` parameters!!
 
 ![Flag](pics/flag.jpg)
 
